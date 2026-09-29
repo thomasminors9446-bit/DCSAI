@@ -1,0 +1,10 @@
+Aircraft:
+DCS mission:
+Roll axis: vJoy Device 1 / X axis
+Telemetry rate: 20 Hz
+Target roll: 0 degrees
+KP: 0.8
+KD: 0.20
+MAX_AILERON: 0.25
+INVERT_AILERON: False
+Result: Roll hold works

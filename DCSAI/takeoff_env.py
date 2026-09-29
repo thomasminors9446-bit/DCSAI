@@ -39,8 +39,8 @@ class TakeoffEnv(gym.Env):
     # ----- constants for waypoint handling -----
     WAYPOINT_RADIUS_M = 10.0  # success tolerance around waypoint
     MAX_WAYPOINT_DISTANCE_M = 5000.0  # observation space cap
-    WAYPOINT_REWARD_COEFF = 0.5
-    WAYPOINT_PENALTY_COEFF = 0.01
+    WAYPOINT_REWARD_COEFF = 2.0
+    WAYPOINT_PENALTY_COEFF = 0.005
     # -------------------------------------------------
 
     def __init__(
@@ -156,6 +156,7 @@ class TakeoffEnv(gym.Env):
             "time",
             "altitude_m",
             "speed_mps",
+            "forward_m",
             "vertical_speed_mps",
             "lateral_m",
             "heading_rad",
@@ -191,6 +192,7 @@ class TakeoffEnv(gym.Env):
             "time": step * self.dt,
             "altitude_m": self.altitude_m,
             "speed_mps": self.speed_mps,
+            "forward_m": self.forward_m,
             "vertical_speed_mps": self.vertical_speed_mps,
             "lateral_m": self.lateral_m,
             "heading_rad": self.heading_rad,
@@ -223,25 +225,28 @@ class TakeoffEnv(gym.Env):
         lateral = [t["lateral_m"] for t in self._trajectory]
         altitude = [t["altitude_m"] for t in self._trajectory]
 
-        fig, axs = plt.subplots(2, 1, figsize=(8, 10), sharex=True)
+        fig = plt.figure(figsize=(8, 10))
+        ax1 = fig.add_axes([0.1, 0.55, 0.85, 0.4])
+        ax2 = fig.add_axes([0.1, 0.1, 0.85, 0.4])
 
         # Ground‑track plot
-        axs[0].plot(forward, lateral, label="Aircraft track")
+        ax1.plot(forward, lateral, label="Aircraft track", marker=None)
         if self.waypoint:
-            axs[0].scatter([self.waypoint[0]], [self.waypoint[1]], color="red", marker="X", s=100, label="Waypoint")
-        axs[0].set_ylabel("Lateral offset (m)")
-        axs[0].legend()
-        axs[0].grid(True)
+            # ax1.scatter([self.waypoint[0]], [self.waypoint[1]], color="red", marker="X", s=100, label="Waypoint")
+            pass
+        ax1.set_ylabel("Lateral offset (m)")
+        # ax1.legend()
+        ax1.grid(True)
 
         # Altitude profile
-        axs[1].plot(forward, altitude, label="Altitude")
-        axs[1].set_xlabel("Forward distance (m)")
-        axs[1].set_ylabel("Altitude (m)")
-        axs[1].legend()
-        axs[1].grid(True)
+        ax2.plot(forward, altitude, label="Altitude", marker=None)
+        ax2.set_xlabel("Forward distance (m)")
+        ax2.set_ylabel("Altitude (m)")
+        # ax2.legend()
+        ax2.grid(True)
 
         plot_path = self.log_dir / f"trajectory_{self._episode_timestamp}.png"
-        fig.tight_layout()
+        # fig.tight_layout()
         fig.savefig(plot_path)
         plt.close(fig)
 
